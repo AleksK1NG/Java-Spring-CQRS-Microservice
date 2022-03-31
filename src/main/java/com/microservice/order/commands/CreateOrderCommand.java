@@ -1,5 +1,6 @@
 package com.microservice.order.commands;
 
+import com.microservice.order.domain.OrderStatus;
 import com.microservice.shared.BaseCommand;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,9 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class CreateOrderCommand extends BaseCommand {
-    private String email;
+    private String userEmail;
+    private String userName;
     private String deliveryAddress;
+    private OrderStatus status;
     private ZonedDateTime deliveryDate;
 }
