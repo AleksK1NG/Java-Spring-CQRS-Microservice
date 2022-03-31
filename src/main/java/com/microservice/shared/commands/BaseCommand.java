@@ -1,4 +1,4 @@
-package com.microservice.shared;
+package com.microservice.shared.commands;
 
 
 import lombok.AllArgsConstructor;

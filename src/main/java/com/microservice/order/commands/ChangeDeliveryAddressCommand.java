@@ -1,6 +1,6 @@
 package com.microservice.order.commands;
 
-import com.microservice.shared.BaseCommand;
+import com.microservice.shared.commands.BaseCommand;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
