@@ -1,11 +1,15 @@
 package com.microservice.order.commands;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.exceptions.OrderNotFoundException;
 import com.microservice.order.mappers.OrderMapper;
 import com.microservice.order.repository.OrderPostgresRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,6 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderCommandsHandler implements CommandsHandler {
     private final OrderPostgresRepository postgresRepository;
+    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @Override
     public String handle(CreateOrderCommand command) {
@@ -48,6 +54,17 @@ public class OrderCommandsHandler implements CommandsHandler {
         order.setDeliveryAddress(command.getDeliveryAddress());
         order.setUpdatedAt(ZonedDateTime.now());
         postgresRepository.save(order);
+
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(order);
+            ProducerRecord<String, byte[]> record = new ProducerRecord<>("change_delivery_address", bytes);
+            record.headers().add("Alex", "PRO".getBytes());
+            kafkaTemplate.send(record);
+            log.info("kafka send: {}", record);
+        } catch (JsonProcessingException e) {
+            log.error("JsonProcessingException: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
 }
