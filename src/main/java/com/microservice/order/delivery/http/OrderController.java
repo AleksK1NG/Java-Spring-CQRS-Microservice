@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -33,7 +34,7 @@ public class OrderController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createOrder(@RequestBody CreateOrderCommand command) {
+    public ResponseEntity<?> createOrder(@Valid @RequestBody CreateOrderCommand command) {
         command.setId(UUID.randomUUID().toString());
         command.setStatus(OrderStatus.NEW);
         final var id = commandsHandler.handle(command);
@@ -42,7 +43,7 @@ public class OrderController {
     }
 
     @PutMapping(path = "{id}/address", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> changeDeliveryAddress(@RequestBody ChangeDeliveryAddressCommand command, @PathVariable String id) {
+    public ResponseEntity<Void> changeDeliveryAddress(@RequestBody @Valid ChangeDeliveryAddressCommand command, @PathVariable String id) {
         command.setId(id);
         commandsHandler.handle(command);
         log.info("changed address id: {}, address: {}", id, command.getDeliveryAddress());
@@ -50,7 +51,7 @@ public class OrderController {
     }
 
     @PutMapping(path = "{id}/status", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateOrderStatus(@RequestBody UpdateOrderStatusCommand command, @PathVariable String id) {
+    public ResponseEntity<Void> updateOrderStatus( @RequestBody @Valid UpdateOrderStatusCommand command, @PathVariable String id) {
         command.setId(id);
         commandsHandler.handle(command);
         log.info("changed address id: {}, status: {}", id, command.getStatus());

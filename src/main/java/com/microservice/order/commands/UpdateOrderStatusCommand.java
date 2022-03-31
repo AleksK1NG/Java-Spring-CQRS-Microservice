@@ -7,11 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class UpdateOrderStatusCommand extends BaseCommand {
+    @NotNull
     private OrderStatus status;
 }
