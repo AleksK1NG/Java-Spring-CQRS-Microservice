@@ -33,3 +33,4 @@ build/
 .vscode/
 pgdata
 kafka_data
+zookeeper
