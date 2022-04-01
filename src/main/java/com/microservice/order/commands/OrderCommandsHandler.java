@@ -2,6 +2,7 @@ package com.microservice.order.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microservice.configuration.OrderKafkaTopics;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.exceptions.OrderNotFoundException;
 import com.microservice.order.mappers.OrderMapper;
@@ -26,6 +27,7 @@ public class OrderCommandsHandler implements CommandsHandler {
     private final OrderPostgresRepository postgresRepository;
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
+    private final OrderKafkaTopics orderKafkaTopics;
 
     @Override
     public String handle(CreateOrderCommand command) {
@@ -60,7 +62,7 @@ public class OrderCommandsHandler implements CommandsHandler {
 
         try {
             byte[] bytes = objectMapper.writeValueAsBytes(order);
-            ProducerRecord<String, byte[]> record = new ProducerRecord<>("change_delivery_address", bytes);
+            ProducerRecord<String, byte[]> record = new ProducerRecord<>(orderKafkaTopics.getOrderAddressChangedTopic(), bytes);
             record.headers().add("Alex", "PRO".getBytes());
             kafkaTemplate.send(record).get(1000, TimeUnit.MILLISECONDS);
             log.info("kafka send: {}", record);

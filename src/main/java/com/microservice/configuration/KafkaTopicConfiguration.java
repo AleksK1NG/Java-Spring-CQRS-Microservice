@@ -21,6 +21,7 @@ public class KafkaTopicConfiguration {
     private String bootstrapServers;
 
     private final KafkaConfigProperties kafkaConfigProperties;
+    private final OrderKafkaTopics orderKafkaTopics;
 
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -32,7 +33,7 @@ public class KafkaTopicConfiguration {
     @Bean
     public NewTopic createOrderTopicInitializer(KafkaAdmin kafkaAdmin) {
         try {
-            final var topicName = "create_order";
+            final var topicName = orderKafkaTopics.getOrderCreatedTopic();
             final var topic = new NewTopic(topicName, 3, (short) 1);
             kafkaAdmin.createOrModifyTopics(topic);
             log.info("topic: {}", topic);
@@ -46,7 +47,7 @@ public class KafkaTopicConfiguration {
     @Bean
     public NewTopic updateStatusTopicInitializer(KafkaAdmin kafkaAdmin) {
         try {
-            final var topicName = "update_order_status";
+            final var topicName = orderKafkaTopics.getOrderStatusUpdatedTopic();
             final var topic = new NewTopic(topicName, 3, (short) 1);
             kafkaAdmin.createOrModifyTopics(topic);
             log.info("topic: {}", topic);
@@ -60,7 +61,7 @@ public class KafkaTopicConfiguration {
     @Bean
     public NewTopic changeDeliveryAddressTopicInitializer(KafkaAdmin kafkaAdmin) {
         try {
-            final var topicName = "change_delivery_address";
+            final var topicName = orderKafkaTopics.getOrderAddressChangedTopic();
             final var topic = new NewTopic(topicName, 3, (short) 1);
             kafkaAdmin.createOrModifyTopics(topic);
             log.info("topic: {}", topic);
