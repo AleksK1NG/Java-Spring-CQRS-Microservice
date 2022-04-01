@@ -7,11 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -19,23 +18,20 @@ import java.time.ZonedDateTime;
 @ToString(callSuper = true)
 public class CreateOrderCommand extends BaseCommand {
     @NotBlank
-    @Min(value = 10L, message = "invalid min length")
-    @Max(value = 500L, message = "max length is 500")
+    @Size(min = 5,max = 250, message = "invalid userEmail length")
     private String userEmail;
 
     @NotBlank
-    @Min(value = 10L, message = "invalid min length")
-    @Max(value = 500L, message = "max length is 500")
+    @Size(min = 5,max = 250, message = "invalid userName length")
     private String userName;
 
     @NotBlank
-    @Min(value = 10L, message = "invalid min length")
-    @Max(value = 500L, message = "max length is 500")
+    @Size(min = 5,max = 250, message = "invalid deliveryAddress length")
     private String deliveryAddress;
 
-    @NotNull
+
     private OrderStatus status;
 
     @NotNull
-    private ZonedDateTime deliveryDate;
+    private LocalDateTime deliveryDate;
 }

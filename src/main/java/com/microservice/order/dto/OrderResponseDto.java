@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +17,7 @@ public class OrderResponseDto {
     private String userName;
     private String deliveryAddress;
     private String status;
-    private ZonedDateTime deliveryDate;
-    private ZonedDateTime createdAt;
-    private ZonedDateTime updatedAt;
+    private LocalDateTime deliveryDate;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -59,6 +59,31 @@ services:
       - zookeeper
     networks: [ "microservices" ]
 
+  mongodb:
+    image: docker.io/bitnami/mongodb:4.4
+    restart: always
+    container_name: microservices_mongo
+    environment:
+      MONGODB_ROOT_USER: admin
+      MONGODB_ROOT_PASSWORD: admin
+      BITNAMI_DEBUG: "false"
+      ALLOW_EMPTY_PASSWORD: "no"
+      MONGODB_SYSTEM_LOG_VERBOSITY: "0"
+      MONGODB_DISABLE_SYSTEM_LOG: "no"
+      MONGODB_DISABLE_JAVASCRIPT: "no"
+      MONGODB_ENABLE_JOURNAL: "yes"
+      MONGODB_ENABLE_IPV6: "no"
+      MONGODB_ENABLE_DIRECTORY_PER_DB: "no"
+      MONGODB_DATABASE: "microservices"
+    volumes:
+      - ./mongodb_data_container:/data/db
+    ports:
+      - "27017:27017"
+    networks: [ "microservices" ]
+
+#volumes:
+#  mongodb_data_container:
+
 networks:
   microservices:
     name: microservices

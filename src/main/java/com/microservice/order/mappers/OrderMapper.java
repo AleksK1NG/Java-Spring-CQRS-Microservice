@@ -4,7 +4,7 @@ import com.microservice.order.commands.CreateOrderCommand;
 import com.microservice.order.domain.Order;
 import com.microservice.order.dto.OrderResponseDto;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public final class OrderMapper {
@@ -30,8 +30,8 @@ public final class OrderMapper {
                 .status(command.getStatus())
                 .deliveryAddress(command.getDeliveryAddress())
                 .deliveryDate(command.getDeliveryDate())
-                .createdAt(ZonedDateTime.now())
-                .updatedAt(ZonedDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }
