@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Data
-public class OrderKafkaTopics {
+public class OrderKafkaTopicsConfiguration {
 
     @Value(value = "${order.kafka.topics.order-created:order-created}")
     private String orderCreatedTopic;

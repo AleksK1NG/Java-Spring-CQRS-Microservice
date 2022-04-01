@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class KafkaProducer {
+public class KafkaProducerConfig {
     @Value(value = "${kafka.bootstrapServers:localhost:9093}")
     private String bootstrapServers;
 

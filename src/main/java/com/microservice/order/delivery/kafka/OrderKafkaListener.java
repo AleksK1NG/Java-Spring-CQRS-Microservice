@@ -23,9 +23,9 @@ public class OrderKafkaListener {
     private final ObjectMapper objectMapper;
     private final JsonSerializer jsonSerializer;
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "order_microservice", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
     public void changeDeliveryAddressListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
-        log.info("(Listener) topic: {}, partition: {}, timestamp: {}, offset: {}, data: {}", meta.topic(), meta.partition(), meta.timestamp(), meta.offset(), new String(data));
+        logEvent(data, meta);
 
         try {
             final var event = jsonSerializer.deserializeFromJsonBytes(data, OrderDeliveryAddressChangedEvent.class);
@@ -37,9 +37,9 @@ public class OrderKafkaListener {
         }
     }
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-status-updated}"}, groupId = "order_microservice", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-status-updated}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
     public void updateOrderStatusListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
-        log.info("(updateOrderStatusListener) data: {}", new String(data));
+        logEvent(data, meta);
 
         try {
             final var event = objectMapper.readValue(data, OrderStatusUpdatedEvent.class);
@@ -51,9 +51,9 @@ public class OrderKafkaListener {
         }
     }
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-created}"}, groupId = "order_microservice", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-created}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
     public void createOrderListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
-        log.info("(createOrderListener) data: {}", new String(data));
+        logEvent(data, meta);
 
         try {
             final var event = objectMapper.readValue(data, OrderCreatedEvent.class);
@@ -63,6 +63,9 @@ public class OrderKafkaListener {
             ack.nack(1000);
             log.error("createOrderListener: {}", e.getMessage());
         }
+    }
 
+    private void logEvent(byte[] data, ConsumerRecordMetadata meta) {
+        log.info("topic: {}, partition: {}, offset: {}, timestamp: {}, data: {},", meta.topic(), meta.partition(), meta.offset(), meta.timestamp(), new String(data));
     }
 }

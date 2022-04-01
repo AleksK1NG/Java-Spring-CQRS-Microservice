@@ -1,7 +1,7 @@
 package com.microservice.order.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.configuration.OrderKafkaTopics;
+import com.microservice.configuration.OrderKafkaTopicsConfiguration;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.events.OrderCreatedEvent;
 import com.microservice.order.events.OrderDeliveryAddressChangedEvent;
@@ -30,7 +30,7 @@ public class OrderCommandsHandler implements CommandsHandler {
     private final OrderPostgresRepository postgresRepository;
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
-    private final OrderKafkaTopics orderKafkaTopics;
+    private final OrderKafkaTopicsConfiguration orderKafkaTopicsConfiguration;
     private final JsonSerializer jsonSerializer;
 
     @Override
@@ -38,7 +38,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         final var order = OrderMapper.orderFromCreateOrderCommand(command);
         final var savedOrder = postgresRepository.save(order);
         final var event = new OrderCreatedEvent(order.getUserEmail(), order.getUserName(), order.getDeliveryAddress(), order.getStatus(), order.getDeliveryDate());
-        publishMessage(orderKafkaTopics.getOrderCreatedTopic(), event, null);
+        publishMessage(orderKafkaTopicsConfiguration.getOrderCreatedTopic(), event, null);
         log.info("savedOrder: {}", savedOrder);
         return savedOrder.getId().toString();
     }
@@ -54,7 +54,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         order.setUpdatedAt(ZonedDateTime.now());
         postgresRepository.save(order);
         final var event = new OrderStatusUpdatedEvent(order.getStatus());
-        publishMessage(orderKafkaTopics.getOrderStatusUpdatedTopic(), event, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
+        publishMessage(orderKafkaTopicsConfiguration.getOrderStatusUpdatedTopic(), event, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
     }
 
 
@@ -70,7 +70,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         order.setUpdatedAt(ZonedDateTime.now());
         postgresRepository.save(order);
         final var event = new OrderDeliveryAddressChangedEvent(order.getDeliveryAddress());
-        publishMessage(orderKafkaTopics.getOrderAddressChangedTopic(), event, null);
+        publishMessage(orderKafkaTopicsConfiguration.getOrderAddressChangedTopic(), event, null);
     }
 
     private void publishMessage(String topic, Object data, Map<String, byte[]> headers) {
