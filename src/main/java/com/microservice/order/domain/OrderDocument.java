@@ -5,43 +5,46 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-@Entity
-@Table(name = "orders")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Order {
+@Document(collection = "orders")
+public class OrderDocument {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private UUID id;
+    private String objectId;
 
-    @Column(name = "user_email")
+    @Column(name = "id")
+    private String id;
+
+    @Column(name = "userEmail")
     private String userEmail;
 
-    @Column(name = "user_name")
+    @Column(name = "userName")
     private String userName;
 
-    @Column(name = "delivery_address")
+    @Column(name = "deliveryAddress")
     private String deliveryAddress;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    @Column(name = "delivery_date")
+    @Column(name = "deliveryDate")
     private LocalDateTime deliveryDate;
 
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }
