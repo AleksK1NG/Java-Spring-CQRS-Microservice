@@ -2,7 +2,7 @@ package com.microservice.order.delivery.kafka;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.order.domain.OrderDocument;
+import com.microservice.order.events.EventsHandler;
 import com.microservice.order.events.OrderCreatedEvent;
 import com.microservice.order.events.OrderDeliveryAddressChangedEvent;
 import com.microservice.order.events.OrderStatusUpdatedEvent;
@@ -17,7 +17,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -26,6 +25,7 @@ public class OrderKafkaListener {
     private final ObjectMapper objectMapper;
     private final JsonSerializer jsonSerializer;
     private final OrderMongoRepository orderMongoRepository;
+    private final EventsHandler eventsHandler;
 
     @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
     public void changeDeliveryAddressListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
@@ -47,6 +47,7 @@ public class OrderKafkaListener {
 
         try {
             final var event = objectMapper.readValue(data, OrderStatusUpdatedEvent.class);
+            eventsHandler.handle(event);
             ack.acknowledge();
             log.info("ack event: {}", event);
         } catch (IOException e) {
@@ -61,19 +62,9 @@ public class OrderKafkaListener {
 
         try {
             final var event = objectMapper.readValue(data, OrderCreatedEvent.class);
+            eventsHandler.handle(event);
             ack.acknowledge();
             log.info("ack event: {}", event);
-            final var document = OrderDocument.builder()
-                    .id(event.id())
-                    .userEmail(event.userEmail())
-                    .userName(event.userName())
-                    .deliveryAddress(event.deliveryAddress())
-                    .deliveryDate(event.deliveryDate())
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            final var insert = orderMongoRepository.insert(document);
-            log.info("insert: {}", insert);
         } catch (IOException e) {
             ack.nack(1000);
             log.error("createOrderListener: {}", e.getMessage());
