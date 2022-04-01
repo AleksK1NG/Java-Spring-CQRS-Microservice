@@ -2,14 +2,15 @@ package com.microservice.order.delivery.kafka;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.order.domain.Order;
+import com.microservice.order.events.OrderCreatedEvent;
+import com.microservice.order.events.OrderDeliveryAddressChangedEvent;
+import com.microservice.order.events.OrderStatusUpdatedEvent;
 import com.microservice.shared.serializer.JsonSerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.adapter.ConsumerRecordMetadata;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +28,9 @@ public class OrderKafkaListener {
         log.info("(Listener) topic: {}, partition: {}, timestamp: {}, offset: {}, data: {}", meta.topic(), meta.partition(), meta.timestamp(), meta.offset(), new String(data));
 
         try {
-            Order order = jsonSerializer.deserializeFromJsonBytes(data, Order.class);
+            final var event = jsonSerializer.deserializeFromJsonBytes(data, OrderDeliveryAddressChangedEvent.class);
             ack.acknowledge();
-            log.info("ack order: {}", order);
+            log.info("ack event: {}", event);
         } catch (Exception e) {
             ack.nack(1000);
             log.error("changeDeliveryAddressListener: {}", e.getMessage());
@@ -41,9 +42,9 @@ public class OrderKafkaListener {
         log.info("(updateOrderStatusListener) data: {}", new String(data));
 
         try {
-            final var order = objectMapper.readValue(data, Order.class);
+            final var event = objectMapper.readValue(data, OrderStatusUpdatedEvent.class);
             ack.acknowledge();
-            log.info("ack order: {}", order);
+            log.info("ack event: {}", event);
         } catch (IOException e) {
             ack.nack(1000);
             log.error("updateOrderStatusListener: {}", e.getMessage());
@@ -55,9 +56,9 @@ public class OrderKafkaListener {
         log.info("(createOrderListener) data: {}", new String(data));
 
         try {
-            final var order = objectMapper.readValue(data, Order.class);
+            final var event = objectMapper.readValue(data, OrderCreatedEvent.class);
             ack.acknowledge();
-            log.info("ack order: {}", order);
+            log.info("ack event: {}", event);
         } catch (IOException e) {
             ack.nack(1000);
             log.error("createOrderListener: {}", e.getMessage());

@@ -3,6 +3,9 @@ package com.microservice.order.commands;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.configuration.OrderKafkaTopics;
 import com.microservice.order.domain.OrderStatus;
+import com.microservice.order.events.OrderCreatedEvent;
+import com.microservice.order.events.OrderDeliveryAddressChangedEvent;
+import com.microservice.order.events.OrderStatusUpdatedEvent;
 import com.microservice.order.exceptions.OrderNotFoundException;
 import com.microservice.order.mappers.OrderMapper;
 import com.microservice.order.repository.OrderPostgresRepository;
@@ -34,7 +37,8 @@ public class OrderCommandsHandler implements CommandsHandler {
     public String handle(CreateOrderCommand command) {
         final var order = OrderMapper.orderFromCreateOrderCommand(command);
         final var savedOrder = postgresRepository.save(order);
-        publishMessage(orderKafkaTopics.getOrderCreatedTopic(), savedOrder, null);
+        final var event = new OrderCreatedEvent(order.getUserEmail(), order.getUserName(), order.getDeliveryAddress(), order.getStatus(), order.getDeliveryDate());
+        publishMessage(orderKafkaTopics.getOrderCreatedTopic(), event, null);
         log.info("savedOrder: {}", savedOrder);
         return savedOrder.getId().toString();
     }
@@ -49,7 +53,8 @@ public class OrderCommandsHandler implements CommandsHandler {
         order.setStatus(OrderStatus.valueOf(command.getStatus().toString()));
         order.setUpdatedAt(ZonedDateTime.now());
         postgresRepository.save(order);
-        publishMessage(orderKafkaTopics.getOrderStatusUpdatedTopic(), order, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
+        final var event = new OrderStatusUpdatedEvent(order.getStatus());
+        publishMessage(orderKafkaTopics.getOrderStatusUpdatedTopic(), event, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
     }
 
 
@@ -64,7 +69,8 @@ public class OrderCommandsHandler implements CommandsHandler {
         order.setDeliveryAddress(command.getDeliveryAddress());
         order.setUpdatedAt(ZonedDateTime.now());
         postgresRepository.save(order);
-        publishMessage(orderKafkaTopics.getOrderAddressChangedTopic(), order, null);
+        final var event = new OrderDeliveryAddressChangedEvent(order.getDeliveryAddress());
+        publishMessage(orderKafkaTopics.getOrderAddressChangedTopic(), event, null);
     }
 
     private void publishMessage(String topic, Object data, Map<String, byte[]> headers) {
