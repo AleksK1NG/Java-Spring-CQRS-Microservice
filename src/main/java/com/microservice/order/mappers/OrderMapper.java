@@ -2,6 +2,7 @@ package com.microservice.order.mappers;
 
 import com.microservice.order.commands.CreateOrderCommand;
 import com.microservice.order.domain.Order;
+import com.microservice.order.domain.OrderDocument;
 import com.microservice.order.dto.OrderResponseDto;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,32 @@ public final class OrderMapper {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .status(order.getStatus().name())
+                .build();
+    }
+
+    public static OrderResponseDto orderResponseDtoFromDocument(OrderDocument order) {
+        return OrderResponseDto.builder()
+                .id(order.getId())
+                .userEmail(order.getUserEmail())
+                .userName(order.getUserName())
+                .deliveryAddress(order.getDeliveryAddress())
+                .deliveryDate(order.getDeliveryDate())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .status(order.getStatus().name())
+                .build();
+    }
+
+    public static OrderDocument orderDocumentFromEntity(Order order) {
+        return OrderDocument.builder()
+                .id(order.getId().toString())
+                .userEmail(order.getUserEmail())
+                .userName(order.getUserName())
+                .deliveryAddress(order.getDeliveryAddress())
+                .deliveryDate(order.getDeliveryDate())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
+                .status(order.getStatus())
                 .build();
     }
 
