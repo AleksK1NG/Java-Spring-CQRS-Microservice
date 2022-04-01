@@ -2,7 +2,6 @@ package com.microservice.order.delivery.kafka;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservice.configuration.OrderKafkaTopics;
 import com.microservice.order.domain.Order;
 import com.microservice.shared.serializer.JsonSerializer;
 import lombok.RequiredArgsConstructor;
@@ -22,20 +21,18 @@ import java.io.IOException;
 public class OrderKafkaListener {
     private final ObjectMapper objectMapper;
     private final JsonSerializer jsonSerializer;
-    private final OrderKafkaTopics orderKafkaTopics;
 
     @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "order_microservice", concurrency = "10")
-    public void changeDeliveryAddressListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack, @Header("Alex") byte[] header) {
+    public void changeDeliveryAddressListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
         log.info("(Listener) topic: {}, partition: {}, timestamp: {}, offset: {}, data: {}", meta.topic(), meta.partition(), meta.timestamp(), meta.offset(), new String(data));
 
-        log.info("headers: {}", new String(header));
         try {
             Order order = jsonSerializer.deserializeFromJsonBytes(data, Order.class);
             ack.acknowledge();
             log.info("ack order: {}", order);
         } catch (Exception e) {
             ack.nack(1000);
-            log.error("jsonSerializer.deserializeFromJsonBytes: {}", e.getMessage());
+            log.error("changeDeliveryAddressListener: {}", e.getMessage());
         }
     }
 
@@ -49,7 +46,7 @@ public class OrderKafkaListener {
             log.info("ack order: {}", order);
         } catch (IOException e) {
             ack.nack(1000);
-            log.error("objectMapper.readValue: {}", e.getMessage());
+            log.error("updateOrderStatusListener: {}", e.getMessage());
         }
     }
 
@@ -63,7 +60,7 @@ public class OrderKafkaListener {
             log.info("ack order: {}", order);
         } catch (IOException e) {
             ack.nack(1000);
-            log.error("objectMapper.readValue: {}", e.getMessage());
+            log.error("createOrderListener: {}", e.getMessage());
         }
 
     }
