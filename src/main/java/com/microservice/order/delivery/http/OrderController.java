@@ -4,12 +4,15 @@ import com.microservice.order.commands.ChangeDeliveryAddressCommand;
 import com.microservice.order.commands.CommandsHandler;
 import com.microservice.order.commands.CreateOrderCommand;
 import com.microservice.order.commands.UpdateOrderStatusCommand;
+import com.microservice.order.domain.OrderDocument;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.dto.OrderResponseDto;
 import com.microservice.order.queries.GetOrderByIdQuery;
+import com.microservice.order.queries.GetOrdersByUserEmailQuery;
 import com.microservice.order.queries.QueryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,16 @@ public class OrderController {
         final var order = queryHandler.handle(new GetOrderByIdQuery(id));
         log.info("order: {}", order);
         return ResponseEntity.ok(order);
+    }
+
+    @GetMapping(path = "/byEmail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<OrderDocument>> getOrdersByEmail(@RequestHeader(name = "X-User-Email", required = true) String email,
+                                                                @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+        log.info("email: {}", email);
+        final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
+        log.info("documents: {}", documents);
+        return ResponseEntity.ok(documents);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

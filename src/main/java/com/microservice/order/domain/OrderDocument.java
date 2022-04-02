@@ -20,10 +20,11 @@ import java.time.LocalDateTime;
 @Document(collection = "orders")
 public class OrderDocument {
 
-    @Id
-    private String objectId;
+//    @Id
+//    private String objectId;
 
-    @Column(name = "id")
+    @Id
+    @Column(name = "_id")
     private String id;
 
     @Column(name = "userEmail")

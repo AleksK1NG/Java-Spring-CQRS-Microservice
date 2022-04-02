@@ -8,6 +8,8 @@ import com.microservice.order.repository.OrderMongoRepository;
 import com.microservice.order.repository.OrderPostgresRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -33,5 +35,11 @@ public class OrderQueryHandler implements QueryHandler {
         OrderDocument orderDocument = OrderMapper.orderDocumentFromEntity(order.get());
         mongoRepository.save(orderDocument);
         return OrderMapper.orderResponseDtoFromEntity(order.get());
+    }
+
+    @Override
+    public Page<OrderDocument> handle(GetOrdersByUserEmailQuery query) {
+        final var pageRequest = PageRequest.of(query.page(), query.size());
+        return mongoRepository.findByUserEmailOrderByDeliveryDate(query.userEmail(), pageRequest);
     }
 }
