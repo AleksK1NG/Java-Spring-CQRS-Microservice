@@ -34,3 +34,4 @@ build/
 pgdata
 kafka_data
 zookeeper
+/mongodb_data_container/
