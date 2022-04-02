@@ -42,4 +42,10 @@ public class OrderQueryHandler implements QueryHandler {
         final var pageRequest = PageRequest.of(query.page(), query.size());
         return mongoRepository.findByUserEmailOrderByDeliveryDate(query.userEmail(), pageRequest);
     }
+
+    @Override
+    public Page<OrderDocument> handle(GetOrdersByStatusQuery query) {
+        final var pageRequest = PageRequest.of(query.page(), query.size());
+        return mongoRepository.findByStatusOrderByCreatedAt(query.status(), pageRequest);
+    }
 }
