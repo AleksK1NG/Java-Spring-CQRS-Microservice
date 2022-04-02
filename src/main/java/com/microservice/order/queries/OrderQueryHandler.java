@@ -30,6 +30,7 @@ public class OrderQueryHandler implements QueryHandler {
     @NewSpan(name = "(GetOrderByIdQuery)")
     public OrderResponseDto handle(GetOrderByIdQuery query) {
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("query", query.toString()));
+
         final var document = mongoRepository.findById(query.id());
         if (document.isPresent()) {
             Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("orderDocument", document.toString()));
@@ -41,6 +42,7 @@ public class OrderQueryHandler implements QueryHandler {
 
         final var orderDocument = OrderMapper.orderDocumentFromEntity(order.get());
         mongoRepository.save(orderDocument);
+
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("orderDocument", orderDocument.toString()));
         return OrderMapper.orderResponseDtoFromEntity(order.get());
     }

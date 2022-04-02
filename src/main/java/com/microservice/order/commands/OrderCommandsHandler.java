@@ -64,9 +64,12 @@ public class OrderCommandsHandler implements CommandsHandler {
         final var order = orderOptional.get();
         order.setStatus(OrderStatus.valueOf(command.getStatus().toString()));
         order.setUpdatedAt(LocalDateTime.now());
+
         postgresRepository.save(order);
+
         final var event = new OrderStatusUpdatedEvent(order.getId().toString(), order.getStatus());
         publishMessage(orderKafkaTopicsConfiguration.getOrderStatusUpdatedTopic(), event, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
+
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("event", event.toString()));
     }
 
@@ -83,9 +86,12 @@ public class OrderCommandsHandler implements CommandsHandler {
         final var order = orderOptional.get();
         order.setDeliveryAddress(command.getDeliveryAddress());
         order.setUpdatedAt(LocalDateTime.now());
+
         postgresRepository.save(order);
+
         final var event = new OrderDeliveryAddressChangedEvent(order.getId().toString(), order.getDeliveryAddress());
         publishMessage(orderKafkaTopicsConfiguration.getOrderAddressChangedTopic(), event, null);
+
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("event", event.toString()));
     }
 
@@ -106,6 +112,7 @@ public class OrderCommandsHandler implements CommandsHandler {
             Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("record", record.toString()));
         } catch (Exception e) {
             log.error("publishMessage error: {}", e.getMessage());
+            Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(e));
             throw new RuntimeException(e);
         }
     }

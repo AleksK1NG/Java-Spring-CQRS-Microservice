@@ -35,6 +35,7 @@ public class OrderController {
     @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable String id) {
         final var order = queryHandler.handle(new GetOrderByIdQuery(id));
+
         log.info("find order: {}", order);
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("order", order.toString()));
         return ResponseEntity.ok(order);
@@ -46,6 +47,7 @@ public class OrderController {
                                                                    @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
 
         final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
+
         log.info("documents: {}", documents);
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("documents", documents.toString()));
         return ResponseEntity.ok(documents);
@@ -67,6 +69,7 @@ public class OrderController {
         command.setId(UUID.randomUUID().toString());
         command.setStatus(OrderStatus.NEW);
         final var id = commandsHandler.handle(command);
+
         log.info("created order id: {}", id);
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.CREATED).body(command);
@@ -76,6 +79,7 @@ public class OrderController {
     public ResponseEntity<Void> changeDeliveryAddress(@RequestBody @Valid ChangeDeliveryAddressCommand command, @PathVariable String id) {
         command.setId(id);
         commandsHandler.handle(command);
+
         log.info("changed address id: {}, address: {}", id, command.getDeliveryAddress());
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -85,6 +89,7 @@ public class OrderController {
     public ResponseEntity<Void> updateOrderStatus(@RequestBody @Valid UpdateOrderStatusCommand command, @PathVariable String id) {
         command.setId(id);
         commandsHandler.handle(command);
+
         log.info("updated status id: {}, status: {}", id, command.getStatus());
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
