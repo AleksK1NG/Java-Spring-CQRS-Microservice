@@ -41,6 +41,7 @@ public class OrderKafkaListener {
             log.info("ack event: {}", event);
         } catch (Exception e) {
             ack.nack(1000);
+            Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(e));
             log.error("changeDeliveryAddressListener: {}", e.getMessage());
         }
     }
@@ -58,6 +59,7 @@ public class OrderKafkaListener {
             log.info("ack event: {}", event);
         } catch (IOException e) {
             ack.nack(1000);
+            Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(e));
             log.error("updateOrderStatusListener: {}", e.getMessage());
         }
     }
@@ -75,6 +77,7 @@ public class OrderKafkaListener {
             log.info("ack event: {}", event);
         } catch (IOException e) {
             ack.nack(1000);
+            Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(e));
             log.error("createOrderListener: {}", e.getMessage());
         }
     }

@@ -12,6 +12,7 @@ import com.microservice.order.queries.GetOrdersByUserEmailQuery;
 import com.microservice.order.queries.QueryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,11 +30,13 @@ import java.util.UUID;
 public class OrderController {
     private final CommandsHandler commandsHandler;
     private final QueryHandler queryHandler;
+    private final Tracer tracer;
 
     @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable String id) {
         final var order = queryHandler.handle(new GetOrderByIdQuery(id));
         log.info("find order: {}", order);
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("order", order.toString()));
         return ResponseEntity.ok(order);
     }
 
@@ -43,6 +47,7 @@ public class OrderController {
 
         final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
         log.info("documents: {}", documents);
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("documents", documents.toString()));
         return ResponseEntity.ok(documents);
     }
 
@@ -53,6 +58,7 @@ public class OrderController {
 
         final var documents = queryHandler.handle(new GetOrdersByStatusQuery(status, page, size));
         log.info("documents: {}", documents);
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("documents", documents.toString()));
         return ResponseEntity.ok(documents);
     }
 
@@ -62,6 +68,7 @@ public class OrderController {
         command.setStatus(OrderStatus.NEW);
         final var id = commandsHandler.handle(command);
         log.info("created order id: {}", id);
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.CREATED).body(command);
     }
 
@@ -70,6 +77,7 @@ public class OrderController {
         command.setId(id);
         commandsHandler.handle(command);
         log.info("changed address id: {}, address: {}", id, command.getDeliveryAddress());
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -78,6 +86,7 @@ public class OrderController {
         command.setId(id);
         commandsHandler.handle(command);
         log.info("updated status id: {}, status: {}", id, command.getStatus());
+        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
