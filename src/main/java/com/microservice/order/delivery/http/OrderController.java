@@ -4,7 +4,6 @@ import com.microservice.order.commands.ChangeDeliveryAddressCommand;
 import com.microservice.order.commands.CommandsHandler;
 import com.microservice.order.commands.CreateOrderCommand;
 import com.microservice.order.commands.UpdateOrderStatusCommand;
-import com.microservice.order.domain.OrderDocument;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.dto.OrderResponseDto;
 import com.microservice.order.queries.GetOrderByIdQuery;
@@ -38,9 +37,9 @@ public class OrderController {
     }
 
     @GetMapping(path = "/byEmail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<OrderDocument>> getOrdersByEmail(@RequestHeader(name = "X-User-Email") String email,
-                                                                @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                                                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByEmail(@RequestHeader(name = "X-User-Email") String email,
+                                                                   @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                                                   @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
 
         final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
         log.info("documents: {}", documents);
@@ -48,9 +47,9 @@ public class OrderController {
     }
 
     @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<OrderDocument>> getOrdersByStatus(@RequestParam(name = "status") OrderStatus status,
-                                                                 @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-                                                                 @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+    public ResponseEntity<Page<OrderResponseDto>> getOrdersByStatus(@RequestParam(name = "status") OrderStatus status,
+                                                                    @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                                                    @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
 
         final var documents = queryHandler.handle(new GetOrdersByStatusQuery(status, page, size));
         log.info("documents: {}", documents);
