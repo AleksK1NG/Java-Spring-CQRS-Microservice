@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +15,7 @@ public class OrderResponseDto {
     private String userName;
     private String deliveryAddress;
     private String status;
-    private LocalDateTime deliveryDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String deliveryDate;
+    private String createdAt;
+    private String updatedAt;
 }
