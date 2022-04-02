@@ -25,12 +25,12 @@ public class OrderQueryHandler implements QueryHandler {
 
     @Override
     public OrderResponseDto handle(GetOrderByIdQuery query) {
-        final var document = mongoRepository.findById(query.getId());
+        final var document = mongoRepository.findById(query.id());
         if (document.isPresent()) {
             return OrderMapper.orderResponseDtoFromDocument(document.get());
         }
-        final var order = postgresRepository.findById(UUID.fromString(query.getId()));
-        if (order.isEmpty()) throw new OrderNotFoundException("order not found: " + query.getId());
+        final var order = postgresRepository.findById(UUID.fromString(query.id()));
+        if (order.isEmpty()) throw new OrderNotFoundException("order not found: " + query.id());
 
         OrderDocument orderDocument = OrderMapper.orderDocumentFromEntity(order.get());
         mongoRepository.save(orderDocument);
