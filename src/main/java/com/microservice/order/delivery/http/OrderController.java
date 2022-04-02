@@ -8,6 +8,7 @@ import com.microservice.order.domain.OrderDocument;
 import com.microservice.order.domain.OrderStatus;
 import com.microservice.order.dto.OrderResponseDto;
 import com.microservice.order.queries.GetOrderByIdQuery;
+import com.microservice.order.queries.GetOrdersByStatusQuery;
 import com.microservice.order.queries.GetOrdersByUserEmailQuery;
 import com.microservice.order.queries.QueryHandler;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,16 @@ public class OrderController {
                                                                 @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
         log.info("email: {}", email);
         final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
+        log.info("documents: {}", documents);
+        return ResponseEntity.ok(documents);
+    }
+
+    @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<OrderDocument>> getOrdersByStatus(@RequestParam(name = "status", required = true) OrderStatus status,
+                                                                @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
+                                                                @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+        log.info("status: {}", status);
+        final var documents = queryHandler.handle(new GetOrdersByStatusQuery(status, page, size));
         log.info("documents: {}", documents);
         return ResponseEntity.ok(documents);
     }
