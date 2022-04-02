@@ -81,6 +81,13 @@ services:
       - "27017:27017"
     networks: [ "microservices" ]
 
+  zipkin:
+    image: openzipkin/zipkin:latest
+    restart: always
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
 #volumes:
 #  mongodb_data_container:
 
