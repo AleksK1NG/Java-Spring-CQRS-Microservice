@@ -6,28 +6,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.cloud.sleuth.annotation.NewSpan;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.ZonedDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @ControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
+@Order(1)
+public class OrderControllerAdvice  {
     private final Tracer tracer;
 
     @ExceptionHandler(OrderNotFoundException.class)
@@ -35,8 +29,8 @@ public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
     public ResponseEntity<NotFoundExceptionResponse> handleOrderNotFoundException(OrderNotFoundException ex, WebRequest request) {
         final var response = NotFoundExceptionResponse.builder()
                 .message(ex.getMessage())
-                .status("404")
-                .timestamp(ZonedDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .timestamp(LocalDateTime.now().toString())
                 .build();
         log.error("OrderNotFoundException response: {} ", response);
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(ex));
@@ -44,22 +38,5 @@ public class OrderControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", ZonedDateTime.now());
-        body.put("status", status.value());
 
-
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
-
-        body.put("errors", errors);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(ex));
-
-        return new ResponseEntity<>(body, status);
-    }
 }
