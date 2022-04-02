@@ -35,3 +35,9 @@ pgdata
 kafka_data
 zookeeper
 /mongodb_data_container/
+src/main/resources/metrics/grafana/grafana.db
+src/main/resources/metrics/grafana/alerting
+src/main/resources/metrics/grafana/csv
+src/main/resources/metrics/grafana/plugins
+src/main/resources/metrics/grafana/png
+/prometheus/
