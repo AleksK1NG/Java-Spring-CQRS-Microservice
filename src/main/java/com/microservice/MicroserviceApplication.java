@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "Spring CQRS Microservice",
-        description = "Spring Postgresql MongoDB Kafka Microservice",
+        description = "Spring Postgresql MongoDB Kafka CQRS Microservice",
         contact = @Contact(name = "Alexander Bryksin", email = "alexander.bryksin@yandex.ru", url = "https://github.com/AleksK1NG")))
 public class MicroserviceApplication {
 
