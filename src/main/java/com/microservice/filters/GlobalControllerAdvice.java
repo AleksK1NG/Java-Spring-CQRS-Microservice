@@ -42,9 +42,9 @@ public class GlobalControllerAdvice {
     @NewSpan(name = "handleInvalidArgument")
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleInvalidArgument(MethodArgumentNotValidException ex) {
         final Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errorMap.put(error.getField(), error.getDefaultMessage()));
-        return errorMap;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
     }
 }
