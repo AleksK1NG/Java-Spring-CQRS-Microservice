@@ -11,6 +11,7 @@
 * [Docker](https://www.docker.com/) - Docker
 * [Prometheus](https://prometheus.io/) - Prometheus
 * [Grafana](https://grafana.com/) - Grafana
+* [Flyway](https://flywaydb.org/) - "Database migrations
 
 
 ### Swagger UI:
