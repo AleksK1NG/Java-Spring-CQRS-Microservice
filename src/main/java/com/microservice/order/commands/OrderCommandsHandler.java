@@ -2,12 +2,11 @@ package com.microservice.order.commands;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservice.configuration.OrderKafkaTopicsConfiguration;
+import com.microservice.mappers.OrderMapper;
 import com.microservice.order.domain.OrderStatus;
-import com.microservice.order.events.OrderCreatedEvent;
 import com.microservice.order.events.OrderDeliveryAddressChangedEvent;
 import com.microservice.order.events.OrderStatusUpdatedEvent;
 import com.microservice.order.exceptions.OrderNotFoundException;
-import com.microservice.order.mappers.OrderMapper;
 import com.microservice.order.repository.OrderPostgresRepository;
 import com.microservice.shared.serializer.JsonSerializer;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class OrderCommandsHandler implements CommandsHandler {
 
         final var order = OrderMapper.orderFromCreateOrderCommand(command);
         final var savedOrder = postgresRepository.save(order);
-        final var event = new OrderCreatedEvent(order.getId().toString(), order.getUserEmail(), order.getUserName(), order.getDeliveryAddress(), order.getStatus(), order.getDeliveryDate());
+        final var event = OrderMapper.orderCreatedEventFromOrder(order);
 
         publishMessage(orderKafkaTopicsConfiguration.getOrderCreatedTopic(), event, null);
         log.info("savedOrder: {}", savedOrder);
@@ -68,7 +67,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         postgresRepository.save(order);
 
         final var event = new OrderStatusUpdatedEvent(order.getId().toString(), order.getStatus());
-        publishMessage(orderKafkaTopicsConfiguration.getOrderStatusUpdatedTopic(), event, Map.of("Alex", "PRO".getBytes(StandardCharsets.UTF_8)));
+        publishMessage(orderKafkaTopicsConfiguration.getOrderStatusUpdatedTopic(), event, Map.of("traceId", UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)));
 
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("event", event.toString()));
     }

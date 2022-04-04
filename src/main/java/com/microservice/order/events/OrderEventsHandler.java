@@ -1,7 +1,7 @@
 package com.microservice.order.events;
 
 import com.microservice.order.exceptions.OrderNotFoundException;
-import com.microservice.order.mappers.OrderMapper;
+import com.microservice.mappers.OrderMapper;
 import com.microservice.order.repository.OrderMongoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

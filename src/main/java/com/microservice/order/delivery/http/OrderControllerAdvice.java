@@ -36,7 +36,4 @@ public class OrderControllerAdvice  {
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(ex));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
-
-
-
 }
