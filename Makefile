@@ -4,8 +4,18 @@
 # Docker
 
 local:
+	@echo Clearing kafka data
+	rm -rf ./kafka_data
+	@echo Clearing zookeeper data
+	rm -rf ./zookeeper
 	@echo Starting local docker compose
 	docker-compose -f docker-compose.yaml up -d --build
+
+clean_docker_data:
+	@echo Clearing kafka data
+	rm -rf ./kafka_data
+	@echo Clearing zookeeper data
+	rm -rf ./zookeeper
 
 
 # ==============================================================================

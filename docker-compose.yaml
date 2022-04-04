@@ -50,6 +50,14 @@ services:
       - zookeeper
     networks: [ "microservices" ]
 
+  redis:
+    image: redis:6-alpine
+    restart: always
+    container_name: microservices_redis
+    ports:
+      - "6379:6379"
+    networks: [ "microservices" ]
+
   mongodb:
     image: docker.io/bitnami/mongodb:4.4
     restart: always
@@ -81,17 +89,18 @@ services:
     networks: [ "microservices" ]
 
   grafana:
-    build: grafana/grafana
+    container_name: grafana_container
+    restart: always
+    image: grafana/grafana
     ports:
       - "3000:3000"
-#    volumes:
-#      - ./src/main/resources/metrics/grafana:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks: [ "microservices" ]
 
   prometheus:
+    restart: always
     image: prom/prometheus
     ports:
       - "9090:9090"
@@ -99,9 +108,6 @@ services:
       - ./src/main/resources/metrics/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus:/prometheus
     networks: [ "microservices" ]
-
-#volumes:
-#  mongodb_data_container:
 
 networks:
   microservices:
