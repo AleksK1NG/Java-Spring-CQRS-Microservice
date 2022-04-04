@@ -11,7 +11,7 @@
 * [Docker](https://www.docker.com/) - Docker
 * [Prometheus](https://prometheus.io/) - Prometheus
 * [Grafana](https://grafana.com/) - Grafana
-* [Flyway](https://flywaydb.org/) - "Database migrations
+* [Flyway](https://flywaydb.org/) - Database migrations
 
 
 ### Swagger UI:
@@ -34,5 +34,5 @@ http://localhost:3000
 For local development:
 ```
 make local // runs docker-compose.yaml with all required containers
-then run spring application
+run spring application
 ```
