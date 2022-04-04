@@ -2,7 +2,7 @@ package com.microservice.order.queries;
 
 import com.microservice.order.dto.OrderResponseDto;
 import com.microservice.order.exceptions.OrderNotFoundException;
-import com.microservice.order.mappers.OrderMapper;
+import com.microservice.mappers.OrderMapper;
 import com.microservice.order.repository.OrderMongoRepository;
 import com.microservice.order.repository.OrderPostgresRepository;
 import lombok.RequiredArgsConstructor;

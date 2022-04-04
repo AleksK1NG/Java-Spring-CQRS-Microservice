@@ -19,15 +19,6 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     networks: [ "microservices" ]
 
-  redis:
-    image: redis:6-alpine
-    restart: always
-    container_name: microservices_redis
-    ports:
-      - "6379:6379"
-    networks: [ "microservices" ]
-
-
   zookeeper:
     image: 'bitnami/zookeeper:3.8.0'
     ports:

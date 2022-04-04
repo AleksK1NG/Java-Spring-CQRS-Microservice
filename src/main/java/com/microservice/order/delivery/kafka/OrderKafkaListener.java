@@ -29,7 +29,7 @@ public class OrderKafkaListener {
     private final EventsHandler eventsHandler;
     private final Tracer tracer;
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-address-changed}"}, groupId = "${order.kafka.groupId}", concurrency = "${order.kafka.default-concurrency}")
     @NewSpan(name = "(changeDeliveryAddressListener)")
     public void changeDeliveryAddressListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
         Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("data", new String(data)));
@@ -46,7 +46,7 @@ public class OrderKafkaListener {
         }
     }
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-status-updated}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-status-updated}"}, groupId = "${order.kafka.groupId}", concurrency = "${order.kafka.default-concurrency}")
     @NewSpan(name = "(updateOrderStatusListener)")
     public void updateOrderStatusListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
         logEvent(data, meta);
@@ -64,7 +64,7 @@ public class OrderKafkaListener {
         }
     }
 
-    @KafkaListener(topics = {"${order.kafka.topics.order-created}"}, groupId = "${order.kafka.groupId}", concurrency = "10")
+    @KafkaListener(topics = {"${order.kafka.topics.order-created}"}, groupId = "${order.kafka.groupId}", concurrency = "${order.kafka.default-concurrency}")
     @NewSpan(name = "(createOrderListener)")
     public void createOrderListener(@Payload byte[] data, ConsumerRecordMetadata meta, Acknowledgment ack) {
         logEvent(data, meta);
