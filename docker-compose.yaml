@@ -99,6 +99,14 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks: [ "microservices" ]
 
+  node_exporter:
+    container_name: node_exporter_container
+    restart: always
+    image: prom/node-exporter
+    ports:
+      - '9101:9100'
+    networks: [ "microservices" ]
+
   prometheus:
     restart: always
     image: prom/prometheus

@@ -39,7 +39,7 @@ public class OrderController {
         final var order = queryHandler.handle(new GetOrderByIdQuery(id));
 
         log.info("find order: {}", order);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("order", order.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("order", order.toString()));
         return ResponseEntity.ok(order);
     }
 
@@ -51,7 +51,7 @@ public class OrderController {
         final var documents = queryHandler.handle(new GetOrdersByUserEmailQuery(email, page, size));
 
         log.info("documents: {}", documents);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("documents", documents.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("documents", documents.toString()));
         return ResponseEntity.ok(documents);
     }
 
@@ -62,7 +62,7 @@ public class OrderController {
 
         final var documents = queryHandler.handle(new GetOrdersByStatusQuery(status, page, size));
         log.info("documents: {}", documents);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("documents", documents.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("documents", documents.toString()));
         return ResponseEntity.ok(documents);
     }
 
@@ -72,7 +72,7 @@ public class OrderController {
         final var id = commandsHandler.handle(command);
 
         log.info("created order id: {}", id);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
@@ -84,7 +84,7 @@ public class OrderController {
         commandsHandler.handle(command);
 
         log.info("changed address order id: {}, address: {}", id, command.getDeliveryAddress());
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -96,7 +96,7 @@ public class OrderController {
         commandsHandler.handle(command);
 
         log.info("updated status order id: {}, status: {}", id, command.getStatus());
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("id", id));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("id", id));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

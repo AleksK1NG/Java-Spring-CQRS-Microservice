@@ -39,7 +39,7 @@ public class OrderCommandsHandler implements CommandsHandler {
     @Override
     @NewSpan(name = "(CreateOrderCommand)")
     public String handle(CreateOrderCommand command) {
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("CreateOrderCommand", command.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("CreateOrderCommand", command.toString()));
 
         final var order = OrderMapper.orderFromCreateOrderCommand(command);
         final var savedOrder = postgresRepository.save(order);
@@ -47,7 +47,7 @@ public class OrderCommandsHandler implements CommandsHandler {
 
         publishMessage(orderKafkaTopicsConfiguration.getOrderCreatedTopic(), event, null);
         log.info("savedOrder: {}", savedOrder);
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("savedOrder", savedOrder.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("savedOrder", savedOrder.toString()));
         return savedOrder.getId().toString();
     }
 
@@ -55,7 +55,7 @@ public class OrderCommandsHandler implements CommandsHandler {
     @Transactional
     @NewSpan(name = "(UpdateOrderStatusCommand)")
     public void handle(UpdateOrderStatusCommand command) {
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("UpdateOrderStatusCommand", command.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("UpdateOrderStatusCommand", command.toString()));
 
         final var orderOptional = postgresRepository.findById(UUID.fromString(command.getId()));
         if (orderOptional.isEmpty()) throw new OrderNotFoundException("order not found: " + command.getId());
@@ -69,7 +69,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         final var event = new OrderStatusUpdatedEvent(order.getId().toString(), order.getStatus());
         publishMessage(orderKafkaTopicsConfiguration.getOrderStatusUpdatedTopic(), event, Map.of("traceId", UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)));
 
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("event", event.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("event", event.toString()));
     }
 
 
@@ -77,7 +77,7 @@ public class OrderCommandsHandler implements CommandsHandler {
     @Transactional
     @NewSpan(name = "(ChangeDeliveryAddressCommand)")
     public void handle(ChangeDeliveryAddressCommand command) {
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("ChangeDeliveryAddressCommand", command.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("ChangeDeliveryAddressCommand", command.toString()));
 
         final var orderOptional = postgresRepository.findById(UUID.fromString(command.getId()));
         if (orderOptional.isEmpty()) throw new OrderNotFoundException("order not found: " + command.getId());
@@ -91,7 +91,7 @@ public class OrderCommandsHandler implements CommandsHandler {
         final var event = new OrderDeliveryAddressChangedEvent(order.getId().toString(), order.getDeliveryAddress());
         publishMessage(orderKafkaTopicsConfiguration.getOrderAddressChangedTopic(), event, null);
 
-        Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("event", event.toString()));
+        Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("event", event.toString()));
     }
 
     @NewSpan(name = "(publishMessage)")
@@ -99,7 +99,7 @@ public class OrderCommandsHandler implements CommandsHandler {
 
         try {
             byte[] bytes = jsonSerializer.serializeToJsonBytes(data);
-            Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("data", new String(bytes)));
+            Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("data", new String(bytes)));
             ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, bytes);
 
             if (headers != null) {
@@ -108,10 +108,10 @@ public class OrderCommandsHandler implements CommandsHandler {
 
             kafkaTemplate.send(record).get(1000, TimeUnit.MILLISECONDS);
             log.info("send success: {}", record);
-            Optional.ofNullable(tracer.currentSpan()).map(span -> span.tag("record", record.toString()));
+            Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.tag("record", record.toString()));
         } catch (Exception e) {
             log.error("publishMessage error: {}", e.getMessage());
-            Optional.ofNullable(tracer.currentSpan()).map(span -> span.error(e));
+            Optional.ofNullable(tracer.currentSpan()).ifPresent(span -> span.error(e));
             throw new RuntimeException(e);
         }
     }
